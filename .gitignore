@@ -1,4 +1,7 @@
-build
+.idea
+wwwroot/build
 dist
 node_modules
+npm-debug.log
+.DS_Store
 
