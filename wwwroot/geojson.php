@@ -1,5 +1,7 @@
 <?php
 
+include_once("BluePHP/Utils/DBConnect.inc");
+
 function check_raw_request_json() 
   {  
     if(!count($_POST)) 
@@ -27,19 +29,31 @@ try
       $geojson = [ "type" => "FeatureCollection",
 		   "features" => []
 		   ];
-      $iLngMin = $map["bounds"][0] * 1000;
-      $iLatMin = $map["bounds"][1] * 1000;
-      $iLngMax = $map["bounds"][2] * 1000;
-      $iLatMax = $map["bounds"][3] * 1000;
-      for($i = 0; $i < 10; ++$i)
+      $db = new DBConnect("SQLITE3", "", "../test/imma2016.db", "", "");
+      $db->connectToDB();
+
+      $iLngMin = (int) ($map["bounds"][0] * 10000);
+      $iLatMin = (int) ($map["bounds"][1] * 10000);
+      $iLngMax = (int) ($map["bounds"][2] * 10000);
+      $iLatMax = (int) ($map["bounds"][3] * 10000);
+
+      $query = "select * from imma where longitude > $iLngMin and " . 
+	"longitude < $iLngMax and latitude < $iLatMin and " . 
+	"latitude > $iLatMax";
+      $res = $db->query($query);
+      while($obj = $res->nextAssoc())
 	{
 	  $coords = [
-		     rand((int) $iLngMin, (int) $iLngMax) / 1000.,
-		     rand((int) $iLatMin, (int) $iLatMax) / 1000.
+		     $obj["longitude"] / 10000.,
+		     $obj["latitude"] / 10000.
 		     ];
 	  $pt = [ "type" => "Feature",
 		  "geometry" => [ "type" => "Point", "coordinates" => $coords ],
-		  "properties" => [ "rand" => $i ]
+		  "properties" => [ "siren" => $obj["siren"],
+				    "denomination" => $obj["denomination"],
+				    "longitude" => $obj["longitude"],
+				    "latitude" => $obj["latitude"]
+				    ]
 		  ];
 	  $geojson["features"][] = $pt;
 	}
