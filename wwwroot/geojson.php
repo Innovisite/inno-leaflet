@@ -37,7 +37,31 @@ try
       $iLngMax = (int) ($map["bounds"][2] * 10000);
       $iLatMax = (int) ($map["bounds"][3] * 10000);
 
-      $query = "select * from imma where longitude > $iLngMin and " . 
+//      $query = "select * from imma where longitude > $iLngMin and " . 
+//	"longitude < $iLngMax and latitude < $iLatMin and " . 
+//	"latitude > $iLatMax";
+//      $res = $db->query($query);
+//      while($obj = $res->nextAssoc())
+//	{
+//	  $coords = [
+//		     $obj["longitude"] / 10000.,
+//		     $obj["latitude"] / 10000.
+//		     ];
+//	  $pt = [ "type" => "Feature",
+//		  "geometry" => [ "type" => "Point", "coordinates" => $coords ],
+//		  "properties" => [ "siren" => $obj["siren"],
+//				    "denomination" => $obj["denomination"],
+//				    "longitude" => $obj["longitude"],
+//				    "latitude" => $obj["latitude"]
+//				    ]
+//		  ];
+//	  $geojson["features"][] = $pt;
+//	}
+
+      $query = "select * from clusters where " . 
+	"minZoom <= " . $map["zoom"] . " and " . 
+	"maxZoom >= " . $map["zoom"] . " and " .  
+	"longitude > $iLngMin and " . 
 	"longitude < $iLngMax and latitude < $iLatMin and " . 
 	"latitude > $iLatMax";
       $res = $db->query($query);
@@ -49,10 +73,11 @@ try
 		     ];
 	  $pt = [ "type" => "Feature",
 		  "geometry" => [ "type" => "Point", "coordinates" => $coords ],
-		  "properties" => [ "siren" => $obj["siren"],
-				    "denomination" => $obj["denomination"],
+		  "properties" => [ "id" => $obj["id"],
 				    "longitude" => $obj["longitude"],
-				    "latitude" => $obj["latitude"]
+				    "latitude" => $obj["latitude"],
+				    "size" => $obj["size"],
+				    "zoom" => $obj["zoom"]
 				    ]
 		  ];
 	  $geojson["features"][] = $pt;
